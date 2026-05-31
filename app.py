@@ -31,7 +31,7 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.schema import Document
 from langchain.prompts import PromptTemplate
 
-from htmlTemplates import css, get_user_message_html, get_bot_message_html, get_source_card_html
+from htmlTemplates import css, get_user_message_html, get_bot_message_html, get_source_card_html, get_welcome_html
 
 # ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -76,7 +76,7 @@ def get_pdf_documents(pdf_files: list) -> list[Document]:
                 )
                 documents.append(doc)
         except Exception as e:
-            st.warning(f"⚠️ Could not parse **{getattr(pdf_file, 'name', pdf_file)}**: {e}")
+            st.warning(f"Could not parse {getattr(pdf_file, 'name', pdf_file)}: {e}")
     return documents
 
 
@@ -272,7 +272,7 @@ def handle_user_input(question: str) -> None:
     st.markdown(get_user_message_html(question), unsafe_allow_html=True)
 
     # ── Streaming response ──────────────────────────────────────────────────
-    with st.chat_message("assistant", avatar="🤖"):
+    with st.chat_message("assistant"):
         placeholder = st.empty()
         full_answer = ""
         source_docs = []
@@ -297,7 +297,7 @@ def handle_user_input(question: str) -> None:
 
     # ── Source citations ───────────────────────────────────────────────────
     if source_docs:
-        with st.expander("📚 Source References", expanded=False):
+        with st.expander("Source References", expanded=False):
             seen = set()
             for doc in source_docs:
                 meta = doc.metadata
@@ -328,7 +328,7 @@ def main():
 
     st.set_page_config(
         page_title="DocMind AI",
-        page_icon="🧠",
+        page_icon="doc",
         layout="wide",
         initial_sidebar_state="expanded",
     )
@@ -348,8 +348,8 @@ def main():
 
     # ── Sidebar ─────────────────────────────────────────────────────────────
     with st.sidebar:
-        st.markdown('<div class="sidebar-header">🧠 DocMind AI</div>', unsafe_allow_html=True)
-        st.markdown('<p class="sidebar-sub">Upload PDFs and start asking questions.</p>', unsafe_allow_html=True)
+        st.markdown('<div class="sidebar-wordmark">Doc<span>Mind</span></div>', unsafe_allow_html=True)
+        st.markdown('<span class="sidebar-tagline">Chat with your documents</span>', unsafe_allow_html=True)
 
         pdf_docs = st.file_uploader(
             "Drop your PDFs here",
@@ -361,9 +361,9 @@ def main():
         col1, col2 = st.columns(2)
 
         with col1:
-            process_btn = st.button("⚡ Process", use_container_width=True, type="primary")
+            process_btn = st.button("Process", use_container_width=True, type="primary")
         with col2:
-            clear_btn = st.button("🗑 Clear", use_container_width=True)
+            clear_btn = st.button("Clear", use_container_width=True)
 
         if clear_btn:
             for k in ["conversation", "chat_history", "processed", "current_hash", "summary_data"]:
@@ -375,16 +375,16 @@ def main():
 
             # Check for existing FAISS index (Improvement #3)
             if file_hash == st.session_state.current_hash and st.session_state.processed:
-                st.success("✅ Already processed!")
+                st.success("Already processed.")
             else:
                 embeddings = get_embeddings()
                 cached_vs = load_vectorstore(file_hash, embeddings)
 
                 if cached_vs:
-                    st.success("⚡ Loaded existing vector database")
+                    st.success("Loaded existing vector index.")
                     vectorstore = cached_vs
                 else:
-                    with st.spinner("🔍 Extracting text & building index…"):
+                    with st.spinner("Extracting text and building index..."):
                         docs   = get_pdf_documents(pdf_docs)
                         if not docs:
                             st.error("No readable text found. Are these scanned PDFs?")
@@ -392,7 +392,7 @@ def main():
                         chunks = split_documents(docs)
                         vectorstore = build_vectorstore(chunks)
                         save_vectorstore(vectorstore, file_hash)
-                    st.success(f"✅ Indexed {len(chunks)} chunks from {len(pdf_docs)} PDF(s)")
+                    st.success(f"Indexed {len(chunks)} chunks across {len(pdf_docs)} file(s).")
 
                 st.session_state.conversation  = get_conversation_chain(vectorstore)
                 st.session_state.current_hash  = file_hash
@@ -402,36 +402,20 @@ def main():
         # Summary feature (Improvement #6)
         if st.session_state.processed and pdf_docs:
             st.markdown("---")
-            if st.button("📋 Generate Summary", use_container_width=True):
+            if st.button("Generate Summary", use_container_width=True):
                 with st.spinner("Generating document summary…"):
                     st.session_state.summary_data = generate_summary(pdf_docs)
 
         # File info
         if pdf_docs:
-            st.markdown("---")
-            st.markdown("**Uploaded files:**")
+            st.markdown('<div class="sidebar-divider"></div><span class="sidebar-section-label">Uploaded files</span>', unsafe_allow_html=True)
             for f in pdf_docs:
                 size_kb = round(f.size / 1024, 1)
-                st.markdown(f"📄 `{f.name}` — {size_kb} KB")
+                st.markdown(f'<div class="file-pill"><span class="file-pill-icon"><svg viewBox="0 0 12 14" xmlns="http://www.w3.org/2000/svg"><path d="M1 1h7l3 3v9H1V1z"/></svg></span>{f.name} &nbsp;<span style="color:var(--text-muted);font-size:0.72rem">{size_kb} KB</span></div>', unsafe_allow_html=True)
 
     # ── Main content area ────────────────────────────────────────────────────
     if not st.session_state.processed:
-        # Welcome screen (Improvement #2)
-        st.markdown("""
-        <div class="welcome-container">
-            <div class="welcome-icon">🧠</div>
-            <h1 class="welcome-title">DocMind AI</h1>
-            <p class="welcome-sub">Upload PDFs in the sidebar, click <strong>Process</strong>,<br>then ask anything about your documents.</p>
-            <div class="feature-grid">
-                <div class="feature-card">📖 Multi-PDF Chat</div>
-                <div class="feature-card">🔗 Source Citations</div>
-                <div class="feature-card">⚡ Streaming Answers</div>
-                <div class="feature-card">💾 Persistent Index</div>
-                <div class="feature-card">📋 Auto Summaries</div>
-                <div class="feature-card">🎯 MMR Retrieval</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(get_welcome_html(), unsafe_allow_html=True)
     else:
         # ── Summary cards ──────────────────────────────────────────────────
         if st.session_state.summary_data:
@@ -439,36 +423,36 @@ def main():
             if "error" in data:
                 st.error(data["error"])
             else:
-                st.markdown('<h3 class="section-title">📋 Document Summary</h3>', unsafe_allow_html=True)
+                st.markdown('<div class="section-heading">Document Summary</div>', unsafe_allow_html=True)
                 col_a, col_b = st.columns(2)
                 with col_a:
                     st.markdown(f"""
                     <div class="summary-card">
-                        <div class="summary-label">Quick Overview</div>
+                        <div class="summary-card-label">Quick Overview</div>
                         <p>{data.get('concise_summary','')}</p>
                     </div>""", unsafe_allow_html=True)
                 with col_b:
                     topics = data.get("key_topics", [])
-                    topics_html = "".join(f'<span class="topic-tag">{t}</span>' for t in topics)
+                    topics_html = "".join(f'<span class="tag tag-topic">{t}</span>' for t in topics)
                     st.markdown(f"""
                     <div class="summary-card">
-                        <div class="summary-label">Key Topics</div>
-                        <div class="topic-container">{topics_html}</div>
+                        <div class="summary-card-label">Key Topics</div>
+                        <div class="tag-row">{topics_html}</div>
                     </div>""", unsafe_allow_html=True)
 
                 st.markdown(f"""
                 <div class="summary-card full-width">
-                    <div class="summary-label">Detailed Summary</div>
+                    <div class="summary-card-label">Detailed Summary</div>
                     <p>{data.get('detailed_summary','')}</p>
                 </div>""", unsafe_allow_html=True)
 
                 concepts = data.get("important_concepts", [])
                 if concepts:
-                    concepts_html = "".join(f'<span class="concept-tag">{c}</span>' for c in concepts)
+                    concepts_html = "".join(f'<span class="tag tag-concept">{c}</span>' for c in concepts)
                     st.markdown(f"""
                     <div class="summary-card full-width">
-                        <div class="summary-label">Important Concepts</div>
-                        <div class="topic-container">{concepts_html}</div>
+                        <div class="summary-card-label">Important Concepts</div>
+                        <div class="tag-row">{concepts_html}</div>
                     </div>""", unsafe_allow_html=True)
 
                 st.markdown("---")

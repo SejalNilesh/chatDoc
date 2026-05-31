@@ -1,428 +1,620 @@
 """
 htmlTemplates.py — DocMind AI
-Modern dark theme with professional SaaS aesthetics.
-Improvement #2: Complete UI / UX overhaul.
+Light theme, minimal SaaS aesthetic.
+Inspired by: Notion, Linear, Perplexity, Vercel, ChatGPT.
 """
 
-# ─── Global CSS ───────────────────────────────────────────────────────────────
+# =============================================================================
+# GLOBAL CSS
+# =============================================================================
 
 css = """
 <style>
-/* ── Import fonts ── */
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-/* ── CSS Variables ── */
+/* ── Design tokens ── */
 :root {
-  --bg-primary:    #0d0f14;
-  --bg-secondary:  #13161e;
-  --bg-card:       #1a1e2a;
-  --bg-card-hover: #1f2436;
-  --border:        #252a3a;
-  --accent-1:      #6c63ff;
-  --accent-2:      #00d4aa;
-  --accent-3:      #ff6b6b;
-  --text-primary:  #e8eaf0;
-  --text-secondary:#8b90a8;
-  --text-muted:    #555b74;
-  --user-bubble:   #1e2540;
-  --bot-bubble:    #141824;
-  --radius-lg:     16px;
-  --radius-md:     10px;
-  --radius-sm:     6px;
-  --shadow-glow:   0 0 24px rgba(108,99,255,0.15);
-  --font-display:  'Syne', sans-serif;
-  --font-body:     'DM Sans', sans-serif;
+  --font-sans:      'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display:   'Plus Jakarta Sans', -apple-system, sans-serif;
+
+  --bg-page:        #f7f7f5;
+  --bg-surface:     #ffffff;
+  --bg-muted:       #f3f3f1;
+  --bg-hover:       #efefed;
+
+  --border-subtle:  #e8e8e5;
+  --border-default: #d8d8d5;
+
+  --text-primary:   #1a1a18;
+  --text-secondary: #6b6b68;
+  --text-muted:     #a0a09d;
+  --text-on-accent: #ffffff;
+
+  --accent:         #4f46e5;
+  --accent-light:   #eef2ff;
+  --accent-border:  #c7d2fe;
+  --accent-hover:   #4338ca;
+
+  --success:        #16a34a;
+  --success-bg:     #f0fdf4;
+  --success-border: #bbf7d0;
+
+  --shadow-xs:      0 1px 2px rgba(0,0,0,0.05);
+  --shadow-sm:      0 1px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:      0 4px 12px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+
+  --radius-sm:      6px;
+  --radius-md:      10px;
+  --radius-lg:      14px;
+  --radius-xl:      18px;
 }
 
-/* ── Base overrides ── */
+/* ── Base ── */
 html, body, [class*="css"] {
-  font-family: var(--font-body) !important;
-  background-color: var(--bg-primary) !important;
+  font-family: var(--font-sans) !important;
+  background-color: var(--bg-page) !important;
   color: var(--text-primary) !important;
+  -webkit-font-smoothing: antialiased !important;
 }
 
 .stApp {
-  background: var(--bg-primary) !important;
+  background: var(--bg-page) !important;
 }
 
-/* Animated gradient background strip */
+/* Thin top accent line */
 .stApp::before {
   content: '';
   position: fixed;
   top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3), var(--accent-1));
-  background-size: 200% 100%;
-  animation: shimmer 4s linear infinite;
+  height: 1px;
+  background: var(--border-default);
   z-index: 999;
-}
-@keyframes shimmer {
-  0%   { background-position: 0% 50%; }
-  100% { background-position: 200% 50%; }
 }
 
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {
-  background: var(--bg-secondary) !important;
-  border-right: 1px solid var(--border) !important;
-  padding-top: 1rem !important;
+  background: var(--bg-surface) !important;
+  border-right: 1px solid var(--border-subtle) !important;
 }
 [data-testid="stSidebar"] * {
   color: var(--text-primary) !important;
 }
-
-.sidebar-header {
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 0.25rem;
-  padding: 0 1rem;
+[data-testid="stSidebar"] .stMarkdown p {
+  color: var(--text-secondary) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.6 !important;
+}
+[data-testid="stSidebarContent"] {
+  padding: 1.5rem 1.25rem !important;
 }
 
-.sidebar-sub {
-  font-size: 0.8rem;
-  color: var(--text-muted) !important;
-  padding: 0 1rem;
+/* ── Sidebar typography ── */
+.sidebar-wordmark {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  margin-bottom: 0.2rem;
+}
+.sidebar-wordmark span {
+  color: var(--accent);
+}
+.sidebar-tagline {
+  font-size: 0.78rem;
+  color: var(--text-muted);
   margin-bottom: 1.5rem;
+  display: block;
+}
+.sidebar-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 1.25rem 0;
+}
+.sidebar-section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+  display: block;
+}
+.file-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-muted);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+.file-pill-icon {
+  width: 18px;
+  height: 18px;
+  background: var(--accent-light);
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.file-pill-icon svg {
+  width: 10px;
+  height: 10px;
+  fill: var(--accent);
 }
 
 /* ── File uploader ── */
 [data-testid="stFileUploader"] {
-  background: var(--bg-card) !important;
-  border: 2px dashed var(--border) !important;
+  background: var(--bg-surface) !important;
+  border: 1.5px dashed var(--border-default) !important;
   border-radius: var(--radius-lg) !important;
-  transition: border-color 0.2s ease;
-  padding: 1rem;
+  padding: 0.75rem !important;
+  transition: border-color 0.15s ease, background 0.15s ease !important;
 }
 [data-testid="stFileUploader"]:hover {
-  border-color: var(--accent-1) !important;
+  border-color: var(--accent) !important;
+  background: var(--accent-light) !important;
+}
+[data-testid="stFileUploaderDropzoneInstructions"] {
+  font-size: 0.82rem !important;
+  color: var(--text-secondary) !important;
 }
 
 /* ── Buttons ── */
 .stButton > button {
-  background: linear-gradient(135deg, var(--accent-1), #8a84ff) !important;
-  color: #fff !important;
-  border: none !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.82rem !important;
+  font-weight: 500 !important;
   border-radius: var(--radius-md) !important;
-  font-family: var(--font-display) !important;
-  font-weight: 600 !important;
-  font-size: 0.85rem !important;
-  padding: 0.55rem 1.2rem !important;
-  transition: all 0.2s ease !important;
-  box-shadow: 0 4px 14px rgba(108,99,255,0.3) !important;
-}
-.stButton > button:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 6px 20px rgba(108,99,255,0.45) !important;
-  background: linear-gradient(135deg, #7a71ff, #9990ff) !important;
-}
-.stButton > button:active {
-  transform: translateY(0) !important;
+  padding: 0.45rem 1rem !important;
+  transition: all 0.15s ease !important;
+  letter-spacing: 0.01em !important;
+  cursor: pointer !important;
 }
 
-/* Secondary / clear button */
-.stButton:last-child > button {
-  background: var(--bg-card) !important;
-  color: var(--text-secondary) !important;
+/* Primary button */
+.stButton:first-child > button {
+  background: var(--accent) !important;
+  color: var(--text-on-accent) !important;
+  border: 1px solid var(--accent) !important;
+  box-shadow: var(--shadow-xs) !important;
+}
+.stButton:first-child > button:hover {
+  background: var(--accent-hover) !important;
+  border-color: var(--accent-hover) !important;
+  box-shadow: var(--shadow-sm) !important;
+  transform: translateY(-1px) !important;
+}
+.stButton:first-child > button:active {
+  transform: translateY(0) !important;
   box-shadow: none !important;
-  border: 1px solid var(--border) !important;
+}
+
+/* Secondary / ghost button */
+.stButton:last-child > button {
+  background: var(--bg-surface) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-default) !important;
+  box-shadow: var(--shadow-xs) !important;
 }
 .stButton:last-child > button:hover {
-  border-color: var(--accent-3) !important;
-  color: var(--accent-3) !important;
-  background: var(--bg-card) !important;
+  background: var(--bg-hover) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-default) !important;
 }
 
-/* ── Text input / chat input ── */
+/* ── Inputs ── */
 [data-testid="stChatInput"] textarea,
 .stTextInput input {
-  background: var(--bg-card) !important;
-  border: 1px solid var(--border) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.88rem !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-default) !important;
   color: var(--text-primary) !important;
-  border-radius: var(--radius-md) !important;
-  font-family: var(--font-body) !important;
-  transition: border-color 0.2s;
+  border-radius: var(--radius-lg) !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
 [data-testid="stChatInput"] textarea:focus,
 .stTextInput input:focus {
-  border-color: var(--accent-1) !important;
-  box-shadow: 0 0 0 2px rgba(108,99,255,0.15) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.1) !important;
+  outline: none !important;
 }
 
 /* ── Expander ── */
 .streamlit-expanderHeader {
-  background: var(--bg-card) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-md) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
   color: var(--text-secondary) !important;
-  font-size: 0.85rem !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-md) !important;
 }
 .streamlit-expanderContent {
-  background: var(--bg-card) !important;
-  border: 1px solid var(--border) !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-subtle) !important;
   border-top: none !important;
+  border-radius: 0 0 var(--radius-md) var(--radius-md) !important;
+  padding: 0.75rem !important;
 }
 
 /* ── Spinner ── */
 .stSpinner > div {
-  border-top-color: var(--accent-1) !important;
+  border-top-color: var(--accent) !important;
 }
 
-/* ── Alert / info boxes ── */
+/* ── Alerts ── */
 .stAlert {
-  background: var(--bg-card) !important;
+  background: var(--bg-surface) !important;
   border-radius: var(--radius-md) !important;
+  border: 1px solid var(--border-subtle) !important;
+  font-size: 0.84rem !important;
 }
 
-/* ── Section title ── */
-.section-title {
-  font-family: var(--font-display);
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 1.5rem 0 0.75rem;
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
+
+/* ── Hide Streamlit chrome ── */
+#MainMenu, footer { visibility: hidden; }
+
+/* Keep header visible so sidebar reopen button remains accessible */
+header {
+  visibility: visible !important;
+  background: transparent !important;
+  z-index: 1000 !important;
 }
 
-/* ─────────────── Welcome Screen ─────────────────────────────── */
-.welcome-container {
-  display: flex;
-  flex-direction: column;
+/* Sidebar reopen / collapse control */
+[data-testid="collapsedControl"] {
+  display: flex !important;
+  position: fixed !important;
+  top: 14px !important;
+  left: 14px !important;
+  width: 38px !important;
+  height: 38px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--border-subtle) !important;
+  background: var(--bg-surface) !important;
+  box-shadow: var(--shadow-sm) !important;
+  z-index: 99999 !important;
+}
+
+[data-testid="collapsedControl"]:hover {
+  background: var(--bg-hover) !important;
+  border-color: var(--border-default) !important;
+  transform: translateY(-1px) !important;
+}
+
+[data-testid="collapsedControl"] svg {
+  width: 18px !important;
+  height: 18px !important;
+  color: var(--text-primary) !important;
+}
+
+[data-testid="stDecoration"] { display: none; }
+
+/* =====================================================================
+   WELCOME SCREEN
+   ===================================================================== */
+.welcome-wrap {
+  max-width: 560px;
+  margin: 6rem auto 0;
+  padding: 0 1.5rem;
+}
+.welcome-badge {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 5rem 2rem;
-  text-align: center;
-  animation: fadeInUp 0.7s ease both;
-}
-@keyframes fadeInUp {
-  from { opacity:0; transform:translateY(20px); }
-  to   { opacity:1; transform:translateY(0);    }
-}
-.welcome-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  filter: drop-shadow(0 0 20px rgba(108,99,255,0.5));
+  gap: 6px;
+  background: var(--accent-light);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 1.5rem;
 }
 .welcome-title {
   font-family: var(--font-display);
-  font-size: 3rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--accent-1) 30%, var(--accent-2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
   margin: 0 0 0.75rem;
 }
-.welcome-sub {
-  font-size: 1.1rem;
+.welcome-title em {
+  color: var(--accent);
+  font-style: normal;
+}
+.welcome-desc {
+  font-size: 0.95rem;
   color: var(--text-secondary);
   line-height: 1.7;
-  max-width: 480px;
   margin-bottom: 2.5rem;
 }
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
-  max-width: 520px;
-  width: 100%;
+  gap: 10px;
 }
-.feature-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+.feature-item {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 0.75rem 0.9rem;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  transition: all 0.2s;
+  box-shadow: var(--shadow-xs);
 }
-.feature-card:hover {
-  border-color: var(--accent-1);
+.feature-item-label {
+  font-size: 0.78rem;
+  font-weight: 500;
   color: var(--text-primary);
-  background: var(--bg-card-hover);
+}
+.feature-item-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
 }
 
-/* ─────────────── Chat Bubbles ─────────────────────────────────── */
+/* =====================================================================
+   CHAT BUBBLES
+   ===================================================================== */
 .chat-row {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
-  margin: 1rem 0;
-  animation: fadeInUp 0.3s ease both;
+  gap: 10px;
+  margin: 1.25rem 0;
 }
 .chat-row.user-row {
   flex-direction: row-reverse;
 }
-.avatar {
-  width: 36px;
-  height: 36px;
+.chat-avatar {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 0.7rem;
+  font-weight: 600;
   flex-shrink: 0;
+  margin-top: 2px;
 }
 .user-avatar {
-  background: linear-gradient(135deg, var(--accent-1), #8a84ff);
-  box-shadow: 0 0 12px rgba(108,99,255,0.4);
+  background: var(--accent);
+  color: var(--text-on-accent);
+  letter-spacing: 0.02em;
 }
 .bot-avatar {
-  background: linear-gradient(135deg, var(--accent-2), #00a884);
-  box-shadow: 0 0 12px rgba(0,212,170,0.3);
+  background: var(--bg-muted);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
 }
 .bubble {
-  max-width: 78%;
-  padding: 0.9rem 1.1rem;
+  max-width: 76%;
+  padding: 0.7rem 1rem;
   border-radius: var(--radius-lg);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   line-height: 1.65;
   word-break: break-word;
 }
 .user-bubble {
-  background: var(--user-bubble);
-  border: 1px solid rgba(108,99,255,0.2);
-  color: var(--text-primary);
-  border-top-right-radius: 4px;
+  background: var(--accent);
+  color: var(--text-on-accent);
+  border-bottom-right-radius: var(--radius-sm);
+  box-shadow: var(--shadow-xs);
 }
 .bot-bubble {
-  background: var(--bot-bubble);
-  border: 1px solid var(--border);
+  background: var(--bg-surface);
   color: var(--text-primary);
-  border-top-left-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  border-bottom-left-radius: var(--radius-sm);
+  box-shadow: var(--shadow-xs);
 }
 
-/* ─────────────── Source Citation Cards ─────────────────────────── */
+/* =====================================================================
+   SOURCE CITATION CARDS
+   ===================================================================== */
 .source-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--accent);
   border-radius: var(--radius-md);
-  padding: 0.8rem 1rem;
-  margin-bottom: 0.6rem;
-  font-size: 0.82rem;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.5rem;
+  box-shadow: var(--shadow-xs);
 }
-.source-label {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.78rem;
-  color: var(--accent-2);
+.source-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 0.35rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+}
+.source-filename {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+.source-page-badge {
+  font-size: 0.68rem;
+  font-weight: 500;
+  background: var(--accent-light);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  padding: 1px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
 }
 .source-snippet {
+  font-size: 0.78rem;
   color: var(--text-secondary);
   line-height: 1.55;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 0.35rem;
+  margin-top: 0.35rem;
 }
 
-/* ─────────────── Summary Cards ─────────────────────────────────── */
-.summary-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.1rem 1.3rem;
-  margin-bottom: 0.75rem;
-  animation: fadeInUp 0.4s ease both;
-}
-.summary-label {
+/* =====================================================================
+   SUMMARY CARDS
+   ===================================================================== */
+.section-heading {
   font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--accent-1);
+  color: var(--text-muted);
+  margin: 1.5rem 0 0.75rem;
+}
+.summary-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.75rem;
+  box-shadow: var(--shadow-xs);
+}
+.summary-card-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
   margin-bottom: 0.5rem;
 }
 .summary-card p {
+  font-size: 0.87rem;
   color: var(--text-secondary);
-  font-size: 0.88rem;
   line-height: 1.65;
   margin: 0;
 }
-.topic-container {
+.tag-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 6px;
   margin-top: 0.25rem;
 }
-.topic-tag {
-  background: rgba(108,99,255,0.15);
-  border: 1px solid rgba(108,99,255,0.3);
-  color: #a09cff;
-  font-size: 0.77rem;
+.tag {
+  font-size: 0.73rem;
   font-weight: 500;
-  padding: 0.25rem 0.65rem;
+  padding: 3px 10px;
   border-radius: 999px;
 }
-.concept-tag {
-  background: rgba(0,212,170,0.12);
-  border: 1px solid rgba(0,212,170,0.3);
-  color: var(--accent-2);
-  font-size: 0.77rem;
-  font-weight: 500;
-  padding: 0.25rem 0.65rem;
-  border-radius: 999px;
+.tag-topic {
+  background: var(--accent-light);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
 }
-
-/* ── Hide default streamlit branding ── */
-#MainMenu, footer, header { visibility: hidden; }
-[data-testid="stDecoration"] { display: none; }
+.tag-concept {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success-border);
+}
 </style>
 """
 
-# ─── Template helpers ──────────────────────────────────────────────────────────
+
+# =============================================================================
+# TEMPLATE HELPERS
+# =============================================================================
+
+def _esc(text: str) -> str:
+    """Escape HTML special characters."""
+    return (text
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;"))
+
 
 def get_user_message_html(message: str) -> str:
-    """Render a user chat bubble."""
-    safe_msg = message.replace("<", "&lt;").replace(">", "&gt;")
+    """Render a right-aligned user chat bubble."""
     return f"""
-    <div class="chat-row user-row">
-        <div class="avatar user-avatar">👤</div>
-        <div class="bubble user-bubble">{safe_msg}</div>
-    </div>
-    """
+<div class="chat-row user-row">
+  <div class="chat-avatar user-avatar">You</div>
+  <div class="bubble user-bubble">{_esc(message)}</div>
+</div>"""
 
 
 def get_bot_message_html(message: str) -> str:
-    """Render a bot chat bubble."""
-    # Allow basic markdown-like line breaks but escape HTML
-    safe_msg = message.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>")
+    """Render a left-aligned assistant chat bubble."""
+    safe = _esc(message).replace("\n", "<br>")
     return f"""
-    <div class="chat-row bot-row">
-        <div class="avatar bot-avatar">🤖</div>
-        <div class="bubble bot-bubble">{safe_msg}</div>
-    </div>
-    """
+<div class="chat-row">
+  <div class="chat-avatar bot-avatar">AI</div>
+  <div class="bubble bot-bubble">{safe}</div>
+</div>"""
 
 
 def get_source_card_html(filename: str, page, snippet: str) -> str:
-    """Render a source citation card."""
-    safe_snippet = snippet.replace("<", "&lt;").replace(">", "&gt;")
+    """Render a source citation card with filename, page badge, and snippet."""
     return f"""
-    <div class="source-card">
-        <div class="source-label">📄 {filename} &nbsp;|&nbsp; Page {page}</div>
-        <div class="source-snippet">{safe_snippet}</div>
-    </div>
-    """
+<div class="source-card">
+  <div class="source-card-header">
+    <span class="source-filename">{_esc(str(filename))}</span>
+    <span class="source-page-badge">Page {page}</span>
+  </div>
+  <div class="source-snippet">{_esc(snippet)}</div>
+</div>"""
 
 
-# ── Legacy exports for backward compatibility ──────────────────────────────────
-# (These match the original variable names so nothing breaks if referenced elsewhere)
+def get_welcome_html() -> str:
+    """Render the welcome / empty-state screen."""
+    features = [
+        ("Multi-PDF chat",     "Ask across all documents"),
+        ("Source citations",   "Every answer is grounded"),
+        ("Streaming answers",  "Responses appear live"),
+        ("Persistent index",   "No re-embedding on reload"),
+        ("Auto summaries",     "One-click overview"),
+        ("MMR retrieval",      "Diverse, accurate results"),
+    ]
+    cards = "".join(
+        f'<div class="feature-item">'
+        f'<div class="feature-item-label">{label}</div>'
+        f'<div class="feature-item-desc">{desc}</div>'
+        f'</div>'
+        for label, desc in features
+    )
+    return f"""
+<div class="welcome-wrap">
+  <div class="welcome-badge">Beta</div>
+  <h1 class="welcome-title">Chat with your <em>documents</em></h1>
+  <p class="welcome-desc">
+    Upload one or more PDFs in the sidebar, click Process, then ask anything.
+    Every answer includes source references so you can verify exactly where
+    information came from.
+  </p>
+  <div class="feature-grid">{cards}</div>
+</div>"""
+
+
+# =============================================================================
+# LEGACY COMPATIBILITY
+# Keep these so any code still referencing the old names doesn't break.
+# =============================================================================
 
 bot_template = """
-<div class="chat-row bot-row">
-    <div class="avatar bot-avatar">🤖</div>
-    <div class="bubble bot-bubble">{{MSG}}</div>
-</div>
-"""
+<div class="chat-row">
+  <div class="chat-avatar bot-avatar">AI</div>
+  <div class="bubble bot-bubble">{{MSG}}</div>
+</div>"""
 
 user_template = """
 <div class="chat-row user-row">
-    <div class="avatar user-avatar">👤</div>
-    <div class="bubble user-bubble">{{MSG}}</div>
-</div>
-"""
+  <div class="chat-avatar user-avatar">You</div>
+  <div class="bubble user-bubble">{{MSG}}</div>
+</div>"""
+
+
