@@ -1,65 +1,99 @@
-# MultiPDF Chat App
+# 🧠 DocMind AI — Upgraded Multi-PDF RAG Chatbot
 
-> You can find the tutorial for this project on [YouTube](https://youtu.be/dXxQ0LR-3Hg).
+A portfolio-grade upgrade of the original MultiPDF Chat App.
+All 10 improvements are implemented while keeping the original
+Streamlit + LangChain + FAISS + Groq + HuggingFace architecture intact.
 
-## Introduction
-------------
-The MultiPDF Chat App is a Python application that allows you to chat with multiple PDF documents. You can ask questions about the PDFs using natural language, and the application will provide relevant responses based on the content of the documents. This app utilizes a language model to generate accurate answers to your queries. Please note that the app will only respond to questions related to the loaded PDFs.
+---
 
-## How It Works
-------------
+## Folder structure
 
-![MultiPDF Chat App Diagram](./docs/PDF-LangChain.jpg)
-
-The application follows these steps to provide responses to your questions:
-
-1. PDF Loading: The app reads multiple PDF documents and extracts their text content.
-
-2. Text Chunking: The extracted text is divided into smaller chunks that can be processed effectively.
-
-3. Language Model: The application utilizes a language model to generate vector representations (embeddings) of the text chunks.
-
-4. Similarity Matching: When you ask a question, the app compares it with the text chunks and identifies the most semantically similar ones.
-
-5. Response Generation: The selected chunks are passed to the language model, which generates a response based on the relevant content of the PDFs.
-
-## Dependencies and Installation
-----------------------------
-To install the MultiPDF Chat App, please follow these steps:
-
-1. Clone the repository to your local machine.
-
-2. Install the required dependencies by running the following command:
-   ```
-   pip install -r requirements.txt
-   ```
-
-3. Obtain an API key from OpenAI and add it to the `.env` file in the project directory.
-```commandline
-OPENAI_API_KEY=your_secrit_api_key
+```
+chatDoc_upgraded/
+├── app.py              ← main application (upgraded)
+├── htmlTemplates.py    ← UI templates + global CSS (upgraded)
+├── requirements.txt    ← pinned dependencies
+├── .env                ← add your GROQ_API_KEY here (not committed)
+└── faiss_store/        ← auto-created; stores persistent FAISS indexes
 ```
 
-## Usage
------
-To use the MultiPDF Chat App, follow these steps:
+---
 
-1. Ensure that you have installed the required dependencies and added the OpenAI API key to the `.env` file.
+## Setup
 
-2. Run the `main.py` file using the Streamlit CLI. Execute the following command:
-   ```
-   streamlit run app.py
-   ```
+```bash
+pip install -r requirements.txt
+echo "GROQ_API_KEY=your_key_here" > .env
+streamlit run app.py
+```
 
-3. The application will launch in your default web browser, displaying the user interface.
+---
 
-4. Load multiple PDF documents into the app by following the provided instructions.
+## What was upgraded (all 10 improvements)
 
-5. Ask questions in natural language about the loaded PDFs using the chat interface.
+### 1 · Source Citations + Page References
+- `get_pdf_documents()` now returns `Document` objects with metadata:
+  `source` (filename), `page` (1-based), `total_pages`, `chunk_index`.
+- `ConversationalRetrievalChain` is built with `return_source_documents=True`.
+- After every answer an expandable **📚 Source References** section shows
+  citation cards: `📄 game.pdf | Page 5` + the relevant text snippet.
 
-## Contributing
-------------
-This repository is intended for educational purposes and does not accept further contributions. It serves as supporting material for a YouTube tutorial that demonstrates how to build this project. Feel free to utilize and enhance the app based on your own requirements.
+### 2 · Modern UI / UX
+- Full dark theme with CSS variables (`--bg-primary`, `--accent-1`, etc.).
+- Animated gradient top bar (shimmer effect).
+- `Syne` (display) + `DM Sans` (body) font pairing — no generic fonts.
+- Chat bubbles with avatar icons, gradient accents, smooth fade-in animations.
+- Welcome screen with feature grid before any PDFs are loaded.
+- Summary cards with tag pills for topics and concepts.
+- All Streamlit default branding hidden.
 
-## License
--------
-The MultiPDF Chat App is released under the [MIT License](https://opensource.org/licenses/MIT).# chatDoc
+### 3 · Persistent FAISS Vector Database
+- `compute_file_hash()` creates an MD5 fingerprint from file names + sizes.
+- `save_vectorstore()` calls `FAISS.save_local()` under `faiss_store/<hash>/`.
+- `load_vectorstore()` calls `FAISS.load_local()` on re-upload of same files.
+- Status messages: *"⚡ Loaded existing vector database"* vs *"✅ Indexed N chunks"*.
+
+### 4 · Streaming Responses
+- `ChatGroq` is initialised with `streaming=True`.
+- After the chain returns, the answer is replayed character-by-character in
+  `st.empty()` with a blinking cursor (`▌`), simulating real token streaming.
+- Conversational memory is preserved across streamed turns.
+
+### 5 · Recursive Chunking
+- Replaced `CharacterTextSplitter` with `RecursiveCharacterTextSplitter`.
+- Separators: `["\n\n", "\n", ". ", " ", ""]` — tries paragraph breaks first.
+- `chunk_size=1000`, `chunk_overlap=200` (20% overlap).  
+  *Why*: paragraph-aware splitting reduces mid-sentence breaks; 20% overlap
+  ensures cross-boundary information is not lost.
+
+### 6 · PDF Summarization
+- **Generate Summary** button in the sidebar (appears after processing).
+- Sends a representative text sample (~5 000 chars) to Groq with a
+  JSON-structured prompt.
+- Displays four sections in cards: *Quick Overview*, *Detailed Summary*,
+  *Key Topics* (pill tags), *Important Concepts* (pill tags).
+
+### 7 · Page-Aware Metadata Pipeline
+- `get_pdf_documents()` iterates pages individually, attaching
+  `{"source": filename, "page": page_num, "total_pages": N}` to each `Document`.
+- `split_documents()` adds `chunk_index` after splitting so every chunk
+  carries its origin.
+- Metadata flows through FAISS and is available on `source_documents` at
+  retrieval time.
+
+### 8 · Better RAG Quality
+- **MMR retrieval**: `search_type="mmr"`, `k=4`, `fetch_k=6`, `lambda_mult=0.6`.
+  Balances relevance and diversity, reducing redundant chunks.
+- **Custom system prompt** injected via `PromptTemplate`:
+  *"If the answer cannot be found in the context, clearly say so."*
+- `temperature=0.1` for factual grounding with minimal hallucination.
+
+### 9 · Code Quality
+- Every function has a docstring explaining its purpose.
+- Constants are defined at the top (`CHUNK_SIZE`, `EMBEDDING_MODEL`, etc.).
+- Corrupted/blank PDF pages are skipped with a `st.warning()` — no crash.
+- `get_embeddings()` is cached in session state to avoid reload overhead.
+- Clear separation: PDF processing → chunking → vectorstore → chain → UI.
+
+### 10 · Full Output
+All files are self-contained and ready to run.

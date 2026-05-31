@@ -1,30 +1,32 @@
-# streamlit
-# python-dotenv
-# PyPDF2
-# langchain
-# langchain-community
-# langchain-groq
-# langchain-huggingface
-# faiss-cpu
-# sentence-transformers
+# DocMind AI — requirements.txt
+# Python 3.11+ recommended
 
-streamlit==1.18.1
-python-dotenv==1.0.1
-PyPDF2==3.0.1
+# ── Core framework ──────────────────────────────────────────────
+streamlit>=1.35.0
 
-langchain==0.1.20
-langchain-community==0.0.38
-langchain-core==0.1.53
-langchain-groq==0.1.4
+# ── LangChain ecosystem ─────────────────────────────────────────
+# Pinned to 0.2.x: langchain.memory and ConversationalRetrievalChain
+# were removed in LangChain 0.3+. Pin here to avoid ModuleNotFoundError.
+langchain>=0.2.0,<0.3.0
+langchain-community>=0.2.0,<0.3.0
+langchain-core>=0.2.0,<0.3.0
+langchain-groq>=0.1.6
+langchain-text-splitters>=0.2.0,<0.3.0
 
-faiss-cpu==1.7.4
-sentence-transformers==2.7.0
-transformers==4.41.2
-huggingface-hub==0.23.0
+# ── Vector store ────────────────────────────────────────────────
+faiss-cpu>=1.8.0
 
-# uncomment to use huggingface llms
-# huggingface-hub==0.14.1
+# ── Embeddings ──────────────────────────────────────────────────
+sentence-transformers>=3.0.0
 
-# uncomment to use instructor embeddings
-# InstructorEmbedding==1.0.1
-# sentence-transformers==2.2.2
+# ── PDF parsing ─────────────────────────────────────────────────
+PyPDF2>=3.0.0
+
+# ── LLM / AI providers ──────────────────────────────────────────
+groq>=0.9.0
+
+# ── Env management ──────────────────────────────────────────────
+python-dotenv>=1.0.0
+
+# ── Utilities ───────────────────────────────────────────────────
+numpy>=1.26.0
