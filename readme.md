@@ -48,7 +48,7 @@ streamlit run app.py
 - `compute_file_hash()` creates an MD5 fingerprint from file names + sizes.
 - `save_vectorstore()` calls `FAISS.save_local()` under `faiss_store/<hash>/`.
 - `load_vectorstore()` calls `FAISS.load_local()` on re-upload of same files.
-- Status messages: *"⚡ Loaded existing vector database"* vs *"✅ Indexed N chunks"*.
+- Status messages: *" Loaded existing vector database"* vs *" Indexed N chunks"*.
 
 ### 4 · Streaming Responses
 - `ChatGroq` is initialised with `streaming=True`.
