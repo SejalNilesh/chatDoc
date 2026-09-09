@@ -1,8 +1,5 @@
-# 🧠 DocMind AI — Upgraded Multi-PDF RAG Chatbot
+# DocMind AI — Upgraded Multi-PDF RAG Chatbot
 
-A portfolio-grade upgrade of the original MultiPDF Chat App.
-All 10 improvements are implemented while keeping the original
-Streamlit + LangChain + FAISS + Groq + HuggingFace architecture intact.
 
 ---
 
