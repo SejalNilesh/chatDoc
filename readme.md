@@ -26,13 +26,13 @@ streamlit run app.py
 
 ---
 
-## What was upgraded (all 10 improvements)
+## Features
 
 ### 1 · Source Citations + Page References
 - `get_pdf_documents()` now returns `Document` objects with metadata:
   `source` (filename), `page` (1-based), `total_pages`, `chunk_index`.
 - `ConversationalRetrievalChain` is built with `return_source_documents=True`.
-- After every answer an expandable **📚 Source References** section shows
+- After every answer an expandable ** Source References** section shows
   citation cards: `📄 game.pdf | Page 5` + the relevant text snippet.
 
 ### 2 · Modern UI / UX
