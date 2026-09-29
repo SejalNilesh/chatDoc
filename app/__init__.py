@@ -1,0 +1,3 @@
+"""
+DocMind AI application package.
+"""
