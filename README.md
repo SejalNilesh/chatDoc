@@ -175,6 +175,22 @@ curl -X POST "http://localhost:8000/api/v1/query" \
 - Generated FAISS indexes are stored under `data/faiss_store`.
 - The project is designed for local development and small-scale document intelligence workflows.
 
+ ## Current Limitations
+- PDF input only
+- Scanned/image-only PDFs are not OCR-processed
+- FAISS indexes are stored locally
+- API-side model/conversation state is process-local
+- The current setup targets local development and small-scale usage
+  
+## Branches
+- main — current refactored FastAPI + Streamlit architecture
+- legacy — original ChatDoc implementation preserved for reference
+
+## Security Notes
+- Keep secrets in .env and out of Git
+- Review FAISS deserialization settings before using untrusted indexes
+- Add authentication and shared storage before turning this into a multi-user production service
+
 ## Additional Documentation
 
 - `ARCHITECTURE.md` — project architecture and design decisions
