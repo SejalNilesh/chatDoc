@@ -4,6 +4,62 @@
 
 Separate the Streamlit presentation layer from the RAG pipeline without adding abstractions that the current application does not need.
 
+##
+```text
+                         ┌──────────────────────┐
+                         │      Streamlit       │
+                         │    UI / Web Client   │
+                         └──────────┬───────────┘
+                                    │ HTTP
+                                    ▼
+                         ┌──────────────────────┐
+                         │       FastAPI        │
+                         │      API Layer       │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │        Routes        │
+                         │                      │
+                         │  documents.py        │
+                         │  query.py            │
+                         │  health.py           │
+                         └───────┬───────┬──────┘
+                                 │       │
+                    ┌────────────┘       └─────────────┐
+                    ▼                                  ▼
+          ┌────────────────────┐             ┌────────────────────┐
+          │  Ingestion Service │             │  Retrieval Service │
+          └─────────┬──────────┘             └──────────┬─────────┘
+                    │                                   │
+                    │                                   │
+                    ▼                                   ▼
+          ┌────────────────────┐             ┌────────────────────┐
+          │ Embedding Service  │             │ Embedding Service  │
+          │ HuggingFace Model  │             │ Query Embedding    │
+          └─────────┬──────────┘             └──────────┬─────────┘
+                    │                                   │
+                    │ document embeddings               │ query vector
+                    ▼                                   ▼
+          ┌────────────────────┐             ┌────────────────────┐
+          │   FAISS Index      │◄────────────│    FAISS Search    │
+          │   Vector Store     │             └─────────┬──────────┘
+          └────────────────────┘                       │
+                                                       │
+                                              Relevant Chunks
+                                              + Metadata / Sources
+                                                       │
+                                                       ▼
+                                             ┌────────────────────┐
+                                             │     Groq LLM       │
+                                             │     Answer Gen     │
+                                             └────────────────────┘
+
+
+                    Summary Flow
+          documents.py ──→ Summary Service ──→ Groq LLM
+```
+
 ## Request flow
 
 ```text
