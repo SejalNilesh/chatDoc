@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.env
+.DS_Store
+*.log
+streamlit/.streamlit/
+data/faiss_store/*
+!data/faiss_store/.gitkeep
+docker-compose.yml
+Dockerfile
