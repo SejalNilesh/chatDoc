@@ -1,6 +1,7 @@
 # DocMind — RAG-based Document Intelligence
 
-DocMind is a document Q&A and summarization application built with a FastAPI backend, a Streamlit frontend, and a retrieval-augmented generation (RAG) pipeline powered by LangChain, FAISS, sentence-transformers, and Groq.
+DocMind is a document Q&A and summarization application 
+Built with a FastAPI backend, a Streamlit frontend, and a retrieval-augmented generation (RAG) pipeline powered by LangChain, FAISS, sentence-transformers, and Groq.
 
 It lets you upload PDF documents, ingest them into a vector store, ask natural-language questions about the content, and receive grounded answers based on the document context.
 
